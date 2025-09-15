@@ -1,18 +1,44 @@
 {
   "name": "whatsapp-geo-redirect",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "WhatsApp redirect service with country-based routing",
-  "engines": { "node": ">=20" },
+  "description": "Production-ready WhatsApp redirect service with country-based routing and robust error handling",
+  "engines": { 
+    "node": ">=20" 
+  },
   "scripts": {
-    "start": "node server.js",
-    "dev": "NODE_ENV=development node server.js"
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development node src/server.js",
+    "test": "node --test tests/**/*.test.js",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
   },
   "dependencies": {
-    "express": "5.0.1",
-    "ioredis": "5.4.1",
-    "morgan": "1.10.0",
-    "undici": "6.19.8"
-  }
+    "express": "^5.0.1",
+    "ioredis": "^5.4.1",
+    "undici": "^6.19.8"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "redirect",
+    "geo-location",
+    "country-routing",
+    "nodejs",
+    "express",
+    "redis"
+  ],
+  "author": "WhatsApp Geo Redirect Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/whatsapp-geo-redirect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/whatsapp-geo-redirect/issues"
+  },
+  "homepage": "https://github.com/your-org/whatsapp-geo-redirect#readme"
 }

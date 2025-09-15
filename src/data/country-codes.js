@@ -1,4 +1,4 @@
-// Country codes for the dropdown
+// Country codes for the dropdown with emojis and proper formatting
 export const countryCodes = `
 <option value="1">🇺🇸 +1 (US/CA)</option>
 <option value="7">🇷🇺 +7 (RU/KZ)</option>
@@ -205,3 +205,19 @@ export const countryCodes = `
 <option value="995">🇬🇪 +995 (GE)</option>
 <option value="996">🇰🇬 +996 (KG)</option>
 <option value="998">🇺🇿 +998 (UZ)</option>`;
+
+// Helper function to extract country code from full number
+export function extractCountryCode(fullNumber) {
+  if (!fullNumber) return "44";
+  
+  // Common country codes to try (longest first)
+  const countryCodes = ["44", "90", "1", "7", "20", "27", "30", "31", "32", "33", "34", "36", "39", "40", "41", "43", "45", "46", "47", "48", "49", "51", "52", "53", "54", "55", "56", "57", "58", "60", "61", "62", "63", "64", "65", "66", "81", "82", "84", "86", "91", "92", "93", "94", "95", "98"];
+  
+  for (const code of countryCodes) {
+    if (fullNumber.startsWith(code)) {
+      return code;
+    }
+  }
+  
+  return "44"; // default fallback
+}

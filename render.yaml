@@ -8,10 +8,41 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20
+      - key: NODE_ENV
+        value: production
       - key: ADMIN_TOKEN
         sync: false
+        description: "Secure admin token (minimum 16 characters)"
       - key: IPINFO_TOKEN
         sync: false
+        description: "IPInfo API token for geo-location detection"
+      - key: DEFAULT_WHATSAPP_NUMBER
+        value: "1234567890"
+        description: "Default WhatsApp number (E.164 format without +)"
+      - key: TURKEY_WHATSAPP_NUMBER
+        value: "1234567890"
+        description: "Turkey WhatsApp number (E.164 format without +)"
+      - key: DEFAULT_TEXT
+        value: "Hello! How can I help you?"
+        description: "Default prefill text for non-Turkish users"
+      - key: TURKEY_TEXT
+        value: "Merhaba! Size nasıl yardımcı olabilirim?"
+        description: "Turkey prefill text for Turkish users"
+      - key: LOG_LEVEL
+        value: info
+        description: "Logging level (error, warn, info, debug)"
+      - key: GEO_CACHE_TTL
+        value: 86400
+        description: "Geo-location cache TTL in seconds"
+      - key: GEO_TIMEOUT
+        value: 5000
+        description: "Geo-location request timeout in milliseconds"
+      - key: RATE_LIMIT_WINDOW
+        value: 900000
+        description: "Rate limit window in milliseconds"
+      - key: RATE_LIMIT_MAX
+        value: 100
+        description: "Maximum requests per rate limit window"
       - key: REDIS_URL
         fromService:
           type: redis
@@ -19,8 +50,25 @@ services:
           property: connectionString
     autoDeploy: true
     healthCheckPath: "/"
+    healthCheckGracePeriod: 300
+    dockerfilePath: ./Dockerfile
 
   - type: redis
     name: whatsapp-redis
-    ipAllowList: [] # public
+    ipAllowList: [] # public access
     plan: starter
+    maxmemoryPolicy: allkeys-lru
+    persistence: aof
+
+# Optional: Add monitoring service
+# - type: cron
+#   name: health-check-cron
+#   schedule: "*/5 * * * *"
+#   envVars:
+#     - key: HEALTH_CHECK_URL
+#       fromService:
+#         type: web
+#         name: whatsapp-geo-redirect
+#         envVarKey: RENDER_EXTERNAL_URL
+#   buildCommand: "echo 'Health check cron job'"
+#   startCommand: "curl -f $HEALTH_CHECK_URL/health || exit 1"
