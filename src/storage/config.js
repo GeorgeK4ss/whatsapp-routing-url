@@ -41,7 +41,11 @@ class ConfigStorage {
         number_default: config.get('number_default'),
         number_tr: config.get('number_tr'),
         text_default: config.get('text_default'),
-        text_tr: config.get('text_tr')
+        text_tr: config.get('text_tr'),
+        telegram_channel_default: config.get('telegram_channel_default'),
+        telegram_channel_tr: config.get('telegram_channel_tr'),
+        telegram_text_default: config.get('telegram_text_default'),
+        telegram_text_tr: config.get('telegram_text_tr')
       };
 
       logger.info('Using default configuration');
@@ -101,7 +105,11 @@ class ConfigStorage {
         number_default: config.get('number_default'),
         number_tr: config.get('number_tr'),
         text_default: config.get('text_default'),
-        text_tr: config.get('text_tr')
+        text_tr: config.get('text_tr'),
+        telegram_channel_default: config.get('telegram_channel_default'),
+        telegram_channel_tr: config.get('telegram_channel_tr'),
+        telegram_text_default: config.get('telegram_text_default'),
+        telegram_text_tr: config.get('telegram_text_tr')
       };
       
       await this.setConfig(defaultConfig);
@@ -144,6 +152,8 @@ class ConfigStorage {
         config: {
           hasDefaultNumber: !!configTest.number_default,
           hasTurkeyNumber: !!configTest.number_tr,
+          hasDefaultTelegramChannel: !!configTest.telegram_channel_default,
+          hasTurkeyTelegramChannel: !!configTest.telegram_channel_tr,
           keys: Object.keys(configTest)
         }
       };

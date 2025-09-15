@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: whatsapp-geo-redirect
+    name: contact-channels-geo-redirect
     env: node
     plan: starter
     buildCommand: "npm install"
@@ -28,6 +28,18 @@ services:
       - key: TURKEY_TEXT
         value: "Merhaba! Size nasıl yardımcı olabilirim?"
         description: "Turkey prefill text for Turkish users"
+      - key: DEFAULT_TELEGRAM_CHANNEL
+        value: "your_default_channel"
+        description: "Default Telegram channel for non-Turkish users (without @ symbol)"
+      - key: TURKEY_TELEGRAM_CHANNEL
+        value: "your_turkey_channel"
+        description: "Turkey Telegram channel for Turkish users (without @ symbol)"
+      - key: DEFAULT_TELEGRAM_TEXT
+        value: "Hello! How can I help you?"
+        description: "Default Telegram prefill text for non-Turkish users"
+      - key: TURKEY_TELEGRAM_TEXT
+        value: "Merhaba! Size nasıl yardımcı olabilirim?"
+        description: "Turkey Telegram prefill text for Turkish users"
       - key: LOG_LEVEL
         value: info
         description: "Logging level (error, warn, info, debug)"

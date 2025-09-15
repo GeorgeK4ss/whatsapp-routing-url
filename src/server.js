@@ -7,6 +7,7 @@ import { metricsMiddleware, errorMetricsMiddleware, metricsCollector } from './m
 import { rateLimitMiddleware, adminRateLimitMiddleware } from './middleware/rateLimit.js';
 import adminRouter from './routes/admin.js';
 import whatsappRouter from './routes/whatsapp.js';
+import telegramRouter from './routes/telegram.js';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(rateLimitMiddleware);
 // Routes
 app.use('/admin', adminRateLimitMiddleware, adminRouter);
 app.use('/', whatsappRouter);
+app.use('/', telegramRouter);
 
 // Root endpoint - health check and status
 app.get('/', async (req, res) => {
@@ -65,6 +67,7 @@ app.get('/', async (req, res) => {
       },
       endpoints: {
         whatsapp: '/wa',
+        telegram: '/tg',
         admin: '/admin',
         health: '/health',
         metrics: '/metrics'

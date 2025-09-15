@@ -1,13 +1,13 @@
-# WhatsApp Geo Redirect Service v2.0
+# Contact Channels Geo Redirect Service v2.1
 
-A production-ready Node.js service that provides intelligent country-based WhatsApp redirects with robust error handling, comprehensive logging, and modern architecture.
+A production-ready Node.js service that provides intelligent country-based WhatsApp and Telegram redirects with robust error handling, comprehensive logging, and modern architecture.
 
 ## 🚀 Features
 
-- **🌍 Smart Geo-Routing**: Automatically detects user location and routes to appropriate WhatsApp number
-- **🇹🇷 Turkey Routing**: Turkish users → Turkish WhatsApp number
-- **🌎 Global Routing**: All other users → Default WhatsApp number
-- **🎛️ Admin Dashboard**: Beautiful web-based configuration management
+- **🌍 Smart Geo-Routing**: Automatically detects user location and routes to appropriate contact channel
+- **📱 WhatsApp Support**: Turkish users → Turkish WhatsApp number, others → Default WhatsApp number
+- **✈️ Telegram Support**: Turkish users → Turkish Telegram channel, others → Default Telegram channel
+- **🎛️ Admin Dashboard**: Beautiful web-based configuration management for both platforms
 - **🤖 Bot Protection**: Returns preview page for crawlers instead of redirecting
 - **⚡ Redis Caching**: Fast geo-location caching with configurable TTL
 - **🔒 Security**: Rate limiting, input validation, and secure headers
@@ -48,6 +48,10 @@ IPINFO_TOKEN=your_ipinfo_token_here
 DEFAULT_WHATSAPP_NUMBER=1234567890
 TURKEY_WHATSAPP_NUMBER=1234567890
 
+# Telegram Channels (without @ symbol)
+DEFAULT_TELEGRAM_CHANNEL=your_default_channel
+TURKEY_TELEGRAM_CHANNEL=your_turkey_channel
+
 # Optional
 REDIS_URL=redis://localhost:6379
 PORT=3000
@@ -64,19 +68,29 @@ npm run dev
 npm start
 ```
 
-### 4. Configure WhatsApp Numbers
+### 4. Configure Contact Channels
 
 Visit the admin dashboard: `http://localhost:3000/admin?token=YOUR_ADMIN_TOKEN`
+
+Configure both WhatsApp numbers and Telegram channels through the unified admin interface.
 
 ## 🌐 Usage
 
 ### Public Endpoints
 
+#### WhatsApp
 - **Main Redirect**: `/wa` - Redirects users to appropriate WhatsApp number
 - **With Custom Text**: `/wa?text=From%20Summer%20Campaign`
 - **Force Testing**: 
   - `/wa?force=TR` - Force Turkey routing
   - `/wa?force=REST` - Force default routing
+
+#### Telegram
+- **Main Redirect**: `/tg` - Redirects users to appropriate Telegram channel
+- **With Custom Text**: `/tg?text=From%20Summer%20Campaign`
+- **Force Testing**: 
+  - `/tg?force=TR` - Force Turkey routing
+  - `/tg?force=REST` - Force default routing
 
 ### Admin Endpoints
 
@@ -145,8 +159,8 @@ CMD ["npm", "start"]
 Access the admin dashboard at `/admin?token=YOUR_TOKEN` to:
 
 - ✅ View current configuration
-- ✅ Update WhatsApp numbers
-- ✅ Set prefill texts
+- ✅ Update WhatsApp numbers and Telegram channels
+- ✅ Set prefill texts for both platforms
 - ✅ Monitor service health
 - ✅ Reset to defaults
 
@@ -169,7 +183,11 @@ Content-Type: application/json
   "default_number": "7723342065",
   "default_country_code": "44",
   "tr_text": "Merhaba! Size nasıl yardımcı olabilirim?",
-  "default_text": "Hello! How can I help you?"
+  "default_text": "Hello! How can I help you?",
+  "tr_telegram_channel": "your_turkey_channel",
+  "default_telegram_channel": "your_default_channel",
+  "tr_telegram_text": "Merhaba! Size nasıl yardımcı olabilirim?",
+  "default_telegram_text": "Hello! How can I help you?"
 }
 ```
 
@@ -192,7 +210,12 @@ Response:
     "config": {
       "status": "healthy",
       "storage": { "status": "healthy", "type": "redis" },
-      "config": { "hasDefaultNumber": true, "hasTurkeyNumber": true }
+      "config": { 
+        "hasDefaultNumber": true, 
+        "hasTurkeyNumber": true,
+        "hasDefaultTelegramChannel": true,
+        "hasTurkeyTelegramChannel": true
+      }
     },
     "environment": {
       "REDIS_URL": "SET",
@@ -214,7 +237,8 @@ src/
 │   └── country-codes.js
 ├── routes/          # Express routes
 │   ├── admin.js     # Admin dashboard & API
-│   └── whatsapp.js  # WhatsApp redirect logic
+│   ├── whatsapp.js  # WhatsApp redirect logic
+│   └── telegram.js  # Telegram redirect logic
 ├── services/        # Business logic
 │   └── geo.js       # Geo-location service
 ├── storage/         # Data persistence
@@ -263,17 +287,27 @@ src/
 ### Manual Testing
 
 ```bash
-# Test Turkey routing
+# Test WhatsApp Turkey routing
 curl "http://localhost:3000/wa?force=TR"
 
-# Test default routing
+# Test WhatsApp default routing
 curl "http://localhost:3000/wa?force=REST"
 
-# Test with custom text
+# Test WhatsApp with custom text
 curl "http://localhost:3000/wa?text=Test%20Message"
+
+# Test Telegram Turkey routing
+curl "http://localhost:3000/tg?force=TR"
+
+# Test Telegram default routing
+curl "http://localhost:3000/tg?force=REST"
+
+# Test Telegram with custom text
+curl "http://localhost:3000/tg?text=Test%20Message"
 
 # Test bot detection
 curl -H "User-Agent: Googlebot/2.1" "http://localhost:3000/wa"
+curl -H "User-Agent: Googlebot/2.1" "http://localhost:3000/tg"
 ```
 
 ### Health Checks
@@ -308,6 +342,11 @@ curl "http://localhost:3000/admin/api/health?token=YOUR_TOKEN"
 4. **WhatsApp redirects not working**
    - Verify phone numbers are in E.164 format (without +)
    - Check numbers are valid WhatsApp numbers
+   - Test with force parameters
+
+5. **Telegram redirects not working**
+   - Verify channel names are valid (5-32 characters, alphanumeric and underscores only)
+   - Check channels exist and are accessible
    - Test with force parameters
 
 ### Debug Mode
@@ -345,4 +384,4 @@ MIT License - see LICENSE file for details.
 
 ---
 
-**Made with ❤️ for global WhatsApp connectivity**
+**Made with ❤️ for global WhatsApp and Telegram connectivity**

@@ -3,7 +3,7 @@ import { configStorage } from '../storage/config.js';
 import { config } from '../config/settings.js';
 import { logger } from '../utils/logger.js';
 import { asyncHandler, AppError } from '../utils/errors.js';
-import { validateAdminToken, validatePhoneNumber, validateText } from '../config/validation.js';
+import { validateAdminToken, validatePhoneNumber, validateText, validateTelegramChannel } from '../config/validation.js';
 import { countryCodes } from '../data/country-codes.js';
 
 const router = express.Router();
@@ -45,7 +45,10 @@ router.get('/api/config', validateAdmin, asyncHandler(async (req, res) => {
 
 // Update configuration
 router.post('/api/config', validateAdmin, asyncHandler(async (req, res) => {
-  const { tr_number, default_number, default_country_code, tr_text, default_text } = req.body;
+  const { 
+    tr_number, default_number, default_country_code, tr_text, default_text,
+    tr_telegram_channel, default_telegram_channel, tr_telegram_text, default_telegram_text
+  } = req.body;
   
   const updates = {};
   
@@ -68,6 +71,24 @@ router.post('/api/config', validateAdmin, asyncHandler(async (req, res) => {
   
   if (default_text !== undefined) {
     updates.text_default = validateText(default_text, 'default text');
+  }
+  
+  // Process Telegram channels
+  if (tr_telegram_channel) {
+    updates.telegram_channel_tr = validateTelegramChannel(tr_telegram_channel, 'Turkey Telegram channel');
+  }
+  
+  if (default_telegram_channel) {
+    updates.telegram_channel_default = validateTelegramChannel(default_telegram_channel, 'default Telegram channel');
+  }
+  
+  // Process Telegram texts
+  if (tr_telegram_text !== undefined) {
+    updates.telegram_text_tr = validateText(tr_telegram_text, 'Turkey Telegram text');
+  }
+  
+  if (default_telegram_text !== undefined) {
+    updates.telegram_text_default = validateText(default_telegram_text, 'default Telegram text');
   }
   
   const updatedConfig = await configStorage.updateConfig(updates);
@@ -337,6 +358,22 @@ function generateAdminHTML(currentConfig, envStatus) {
           <span class="current-label">Default Text:</span>
           <span class="current-value">${currentConfig.text_default || '(none)'}</span>
         </div>
+        <div class="current-item">
+          <span class="current-label">Turkey Telegram Channel:</span>
+          <span class="current-value">@${currentConfig.telegram_channel_tr || '(none)'}</span>
+        </div>
+        <div class="current-item">
+          <span class="current-label">Default Telegram Channel:</span>
+          <span class="current-value">@${currentConfig.telegram_channel_default || '(none)'}</span>
+        </div>
+        <div class="current-item">
+          <span class="current-label">Turkey Telegram Text:</span>
+          <span class="current-value">${currentConfig.telegram_text_tr || '(none)'}</span>
+        </div>
+        <div class="current-item">
+          <span class="current-label">Default Telegram Text:</span>
+          <span class="current-value">${currentConfig.telegram_text_default || '(none)'}</span>
+        </div>
       </div>
 
       <form id="configForm">
@@ -374,6 +411,43 @@ function generateAdminHTML(currentConfig, envStatus) {
           <label for="default_text">🌍 Default Prefill Text</label>
           <textarea id="default_text" name="default_text" placeholder="Hello! How can I help you?">${currentConfig.text_default || ''}</textarea>
           <div class="help">Optional text to prefill for non-Turkish users</div>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #e9ecef;">
+        <h3 style="margin: 0 0 20px; color: #2c3e50; text-align: center;">✈️ Telegram Configuration</h3>
+
+        <div class="form-group">
+          <label for="tr_telegram_channel">🇹🇷 Turkey Telegram Channel</label>
+          <div class="input-group">
+            <span class="country-code">@</span>
+            <input type="text" id="tr_telegram_channel" name="tr_telegram_channel" 
+                   value="${currentConfig.telegram_channel_tr || ''}" 
+                   placeholder="your_turkey_channel" style="flex: 1; min-width: 0;">
+          </div>
+          <div class="help">Telegram channel username for Turkish users (without @ symbol)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="default_telegram_channel">🌍 Default Telegram Channel</label>
+          <div class="input-group">
+            <span class="country-code">@</span>
+            <input type="text" id="default_telegram_channel" name="default_telegram_channel" 
+                   value="${currentConfig.telegram_channel_default || ''}" 
+                   placeholder="your_default_channel" style="flex: 1; min-width: 0;">
+          </div>
+          <div class="help">Telegram channel username for non-Turkish users (without @ symbol)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="tr_telegram_text">🇹🇷 Turkey Telegram Prefill Text</label>
+          <textarea id="tr_telegram_text" name="tr_telegram_text" placeholder="Merhaba! Size nasıl yardımcı olabilirim?">${currentConfig.telegram_text_tr || ''}</textarea>
+          <div class="help">Optional text to prefill for Turkish users on Telegram</div>
+        </div>
+
+        <div class="form-group">
+          <label for="default_telegram_text">🌍 Default Telegram Prefill Text</label>
+          <textarea id="default_telegram_text" name="default_telegram_text" placeholder="Hello! How can I help you?">${currentConfig.telegram_text_default || ''}</textarea>
+          <div class="help">Optional text to prefill for non-Turkish users on Telegram</div>
         </div>
 
         <div class="btn-group">
@@ -420,7 +494,11 @@ function generateAdminHTML(currentConfig, envStatus) {
         default_number: formData.get('default_number'),
         default_country_code: formData.get('default_country_code'),
         tr_text: formData.get('tr_text'),
-        default_text: formData.get('default_text')
+        default_text: formData.get('default_text'),
+        tr_telegram_channel: formData.get('tr_telegram_channel'),
+        default_telegram_channel: formData.get('default_telegram_channel'),
+        tr_telegram_text: formData.get('tr_telegram_text'),
+        default_telegram_text: formData.get('default_telegram_text')
       };
       
       try {

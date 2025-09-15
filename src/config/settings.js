@@ -12,6 +12,14 @@ class ConfigManager {
       text_default: process.env.DEFAULT_TEXT || "Hello! How can I help you?",
       text_tr: process.env.TURKEY_TEXT || "Merhaba! Size nasıl yardımcı olabilirim?",
       
+      // Telegram channels
+      telegram_channel_default: process.env.DEFAULT_TELEGRAM_CHANNEL || "your_default_channel",
+      telegram_channel_tr: process.env.TURKEY_TELEGRAM_CHANNEL || "your_turkey_channel",
+      
+      // Telegram prefill texts
+      telegram_text_default: process.env.DEFAULT_TELEGRAM_TEXT || "Hello! How can I help you?",
+      telegram_text_tr: process.env.TURKEY_TELEGRAM_TEXT || "Merhaba! Size nasıl yardımcı olabilirim?",
+      
       // Service configuration
       port: parseInt(process.env.PORT) || 3000,
       nodeEnv: process.env.NODE_ENV || 'development',
@@ -64,6 +72,15 @@ class ConfigManager {
       errors.push('TURKEY_WHATSAPP_NUMBER must be 7-15 digits and not start with 0');
     }
     
+    // Validate Telegram channels
+    if (!/^[a-zA-Z0-9_]{5,32}$/.test(this.config.telegram_channel_default)) {
+      errors.push('DEFAULT_TELEGRAM_CHANNEL must be 5-32 characters, alphanumeric and underscores only');
+    }
+    
+    if (!/^[a-zA-Z0-9_]{5,32}$/.test(this.config.telegram_channel_tr)) {
+      errors.push('TURKEY_TELEGRAM_CHANNEL must be 5-32 characters, alphanumeric and underscores only');
+    }
+    
     // Validate port
     if (this.config.port < 1 || this.config.port > 65535) {
       errors.push('PORT must be between 1 and 65535');
@@ -110,7 +127,11 @@ class ConfigManager {
       number_default: this.config.number_default,
       number_tr: this.config.number_tr,
       text_default: this.config.text_default,
-      text_tr: this.config.text_tr
+      text_tr: this.config.text_tr,
+      telegram_channel_default: this.config.telegram_channel_default,
+      telegram_channel_tr: this.config.telegram_channel_tr,
+      telegram_text_default: this.config.telegram_text_default,
+      telegram_text_tr: this.config.telegram_text_tr
     };
   }
 

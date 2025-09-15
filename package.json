@@ -1,9 +1,9 @@
 {
-  "name": "whatsapp-geo-redirect",
-  "version": "2.0.0",
+  "name": "contact-channels-geo-redirect",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
-  "description": "Production-ready WhatsApp redirect service with country-based routing and robust error handling",
+  "description": "Production-ready WhatsApp and Telegram redirect service with country-based routing and robust error handling",
   "engines": { 
     "node": ">=20" 
   },
@@ -24,6 +24,7 @@
   },
   "keywords": [
     "whatsapp",
+    "telegram",
     "redirect",
     "geo-location",
     "country-routing",
@@ -31,7 +32,7 @@
     "express",
     "redis"
   ],
-  "author": "WhatsApp Geo Redirect Team",
+  "author": "Contact Channels Geo Redirect Team",
   "license": "MIT",
   "repository": {
     "type": "git",

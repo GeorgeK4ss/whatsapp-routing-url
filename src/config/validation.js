@@ -2,6 +2,7 @@ import { ValidationError } from '../utils/errors.js';
 
 export const phoneNumberRegex = /^[1-9]\d{6,14}$/;
 export const countryCodeRegex = /^\d{1,4}$/;
+export const telegramChannelRegex = /^[a-zA-Z0-9_]{5,32}$/;
 
 export function validatePhoneNumber(number, field = 'phone') {
   if (!number) {
@@ -37,6 +38,20 @@ export function validateText(text, field = 'text', maxLength = 1000) {
   return text || '';
 }
 
+export function validateTelegramChannel(channel, field = 'Telegram channel') {
+  if (!channel) {
+    throw new ValidationError(`${field} is required`, field);
+  }
+  
+  const cleanChannel = channel.replace(/^@/, ''); // Remove @ prefix if present
+  
+  if (!telegramChannelRegex.test(cleanChannel)) {
+    throw new ValidationError(`${field} must be 5-32 characters, alphanumeric and underscores only`, field);
+  }
+  
+  return cleanChannel;
+}
+
 export function validateAdminToken(token) {
   if (!token) {
     throw new ValidationError('Admin token is required', 'token');
@@ -56,7 +71,7 @@ export function validateIPAddress(ip) {
   
   // Basic IP validation (IPv4 and IPv6)
   const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+  const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$/;
   
   if (!ipv4Regex.test(ip) && !ipv6Regex.test(ip)) {
     throw new ValidationError('Invalid IP address format', 'ip');
@@ -90,6 +105,40 @@ export function validateConfiguration(config) {
     validateText(config.text_tr, 'Turkey text');
   } catch (error) {
     errors.push(error.message);
+  }
+  
+  // Validate Telegram channels if present
+  if (config.telegram_channel_default) {
+    try {
+      validateTelegramChannel(config.telegram_channel_default, 'default Telegram channel');
+    } catch (error) {
+      errors.push(error.message);
+    }
+  }
+  
+  if (config.telegram_channel_tr) {
+    try {
+      validateTelegramChannel(config.telegram_channel_tr, 'Turkey Telegram channel');
+    } catch (error) {
+      errors.push(error.message);
+    }
+  }
+  
+  // Validate Telegram texts if present
+  if (config.telegram_text_default !== undefined) {
+    try {
+      validateText(config.telegram_text_default, 'default Telegram text');
+    } catch (error) {
+      errors.push(error.message);
+    }
+  }
+  
+  if (config.telegram_text_tr !== undefined) {
+    try {
+      validateText(config.telegram_text_tr, 'Turkey Telegram text');
+    } catch (error) {
+      errors.push(error.message);
+    }
   }
   
   if (errors.length > 0) {
