@@ -190,12 +190,14 @@ function generateAdminHTML(currentConfig, envStatus) {
       align-items: center;
     }
     .country-code {
-      min-width: 120px;
-      padding: 12px;
+      min-width: 80px;
+      max-width: 100px;
+      padding: 12px 8px;
       border: 2px solid #e9ecef;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13px;
       background: #f8f9fa;
+      flex-shrink: 0;
     }
     input[type="text"], input[type="tel"], textarea, select { 
       width: 100%; 
@@ -344,7 +346,7 @@ function generateAdminHTML(currentConfig, envStatus) {
             <span class="country-code">+90 (Fixed)</span>
             <input type="tel" id="tr_number" name="tr_number" 
                    value="${currentConfig.number_tr.startsWith('90') ? currentConfig.number_tr.substring(2) : currentConfig.number_tr}" 
-                   placeholder="5513797933" style="flex: 1;">
+                   placeholder="5513797933" style="flex: 1; min-width: 0;">
           </div>
           <div class="help">Turkey country code (+90) is fixed. Enter only the phone number (e.g., 5513797933)</div>
         </div>
@@ -357,7 +359,7 @@ function generateAdminHTML(currentConfig, envStatus) {
             </select>
             <input type="tel" id="default_number" name="default_number" 
                    value="${currentConfig.number_default.replace(new RegExp('^' + extractCountryCode(currentConfig.number_default)), '')}" 
-                   placeholder="7723342065" style="flex: 1;">
+                   placeholder="7723342065" style="flex: 1; min-width: 0;">
           </div>
           <div class="help">Select country code and enter phone number without country code (e.g., 7723342065)</div>
         </div>
