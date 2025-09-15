@@ -193,11 +193,11 @@ export function rateLimitMiddleware(req, res, next) {
     });
 }
 
-// Admin rate limiting (more restrictive)
+// Admin rate limiting (more lenient for legitimate admin use)
 export function adminRateLimitMiddleware(req, res, next) {
-  // Admin routes get stricter rate limiting
+  // Admin routes get more lenient rate limiting for legitimate admin use
   const originalMaxRequests = rateLimiter.maxRequests;
-  rateLimiter.maxRequests = Math.min(10, originalMaxRequests); // Max 10 requests per window
+  rateLimiter.maxRequests = Math.min(100, originalMaxRequests); // Max 100 requests per window for admin
   
   rateLimitMiddleware(req, res, (error) => {
     // Restore original limit

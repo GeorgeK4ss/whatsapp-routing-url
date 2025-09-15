@@ -38,10 +38,10 @@ services:
         value: 5000
         description: "Geo-location request timeout in milliseconds"
       - key: RATE_LIMIT_WINDOW
-        value: 900000
-        description: "Rate limit window in milliseconds"
+        value: 600000
+        description: "Rate limit window in milliseconds (10 minutes)"
       - key: RATE_LIMIT_MAX
-        value: 100
+        value: 500
         description: "Maximum requests per rate limit window"
       - key: REDIS_URL
         fromService:
