@@ -81,3 +81,4 @@ After deployment, configure your WhatsApp numbers via the admin interface:
 - `ADMIN_TOKEN`: Secure token for admin access
 - `IPINFO_TOKEN`: API token for geo-location detection
 - `REDIS_URL`: Redis connection string (auto-configured on Render)
+# Force deploy Mon Sep 15 14:57:23 IDT 2025
