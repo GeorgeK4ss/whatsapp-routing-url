@@ -36,21 +36,26 @@ function saveConfig(config) {
   }
 }
 
-// File-based storage implementation
+// Memory-based storage implementation
 export function getFileStorage() {
-  let config = loadConfig();
-  
   return {
     async get(key) {
-      return config[key] || null;
+      const config = loadConfig();
+      const value = config[key] || null;
+      console.log(`[storage] GET ${key} = ${value}`);
+      return value;
     },
     
     async set(key, value) {
+      console.log(`[storage] SET ${key} = ${value}`);
+      const config = loadConfig();
       config[key] = value;
       return saveConfig(config);
     },
     
     async getAll() {
+      const config = loadConfig();
+      console.log(`[storage] GET ALL =`, config);
       return config;
     }
   };
