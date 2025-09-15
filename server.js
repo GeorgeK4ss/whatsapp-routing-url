@@ -168,7 +168,7 @@ app.get("/admin", async (req, res) => {
           <label for="tr_number">Turkey WhatsApp Number</label>
           <div style="display: flex; gap: 10px; align-items: center;">
             <span style="font-weight: 500; color: #555; min-width: 60px;">+90</span>
-            <input type="tel" id="tr_number" name="tr_number" value="${cfg.number_tr.replace('90', '')}" placeholder="5513797933" style="flex: 1;">
+            <input type="tel" id="tr_number" name="tr_number" value="${cfg.number_tr.startsWith('90') ? cfg.number_tr.substring(2) : cfg.number_tr}" placeholder="5513797933" style="flex: 1;">
           </div>
           <div class="help">Turkey country code (+90) is fixed. Enter only the phone number (e.g., 5513797933)</div>
         </div>
