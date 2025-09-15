@@ -5,7 +5,14 @@ import { fetch } from "undici";
 import { countryCodes } from "./country-codes.js";
 
 const app = express();
-const storage = getFileStorage();
+
+// Simple in-memory storage that persists during service lifetime
+let config = {
+  number_default: "1234567890",
+  number_tr: "1234567890",
+  text_default: "Hello! How can I help you?",
+  text_tr: "Merhaba! Size nasıl yardımcı olabilirim?"
+};
 
 const PORT = process.env.PORT || 3000;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "";
@@ -56,7 +63,6 @@ function getClientIP(req) {
 }
 
 async function getConfig() {
-  const config = await storage.getAll();
   return {
     number_default: config.number_default || DEFAULT_NUMBER_NON_TR,
     number_tr: config.number_tr || DEFAULT_NUMBER_TR,
@@ -68,7 +74,8 @@ async function getConfig() {
 async function setIfPresent(key, value, validator = () => true) {
   if (value !== undefined && value !== null) {
     if (!validator(value)) throw new Error(`Invalid ${key}`);
-    await storage.set(key, value);
+    config[key] = value;
+    console.log(`[config] Updated ${key} = ${value}`);
   }
 }
 
@@ -82,16 +89,16 @@ async function ipToCountry(ip) {
     }).catch(() => "");
   }
 
+  // Simple geo caching in memory
   const cacheKey = `geo_${ip}`;
-  const cached = await storage.get(cacheKey);
-  if (cached) return cached;
+  if (config[cacheKey]) return config[cacheKey];
 
   try {
     const res = await fetch(`https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`);
     if (!res.ok) throw new Error("ipinfo bad response");
     const j = await res.json();
     const c = (j && j.country) ? String(j.country).toUpperCase() : "";
-    if (c) await storage.set(cacheKey, c);
+    if (c) config[cacheKey] = c;
     return c;
   } catch (e) {
     return "";
