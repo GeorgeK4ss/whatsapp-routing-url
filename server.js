@@ -109,7 +109,15 @@ app.use(morgan("tiny"));
 // Health
 app.get("/", async (_req, res) => {
   const cfg = await getConfig();
-  res.type("json").send(toJSON({ ok: true, cfg }));
+  res.type("json").send(toJSON({ 
+    ok: true, 
+    cfg,
+    env: {
+      REDIS_URL: process.env.REDIS_URL ? "SET" : "NOT SET",
+      ADMIN_TOKEN: process.env.ADMIN_TOKEN ? "SET" : "NOT SET",
+      IPINFO_TOKEN: process.env.IPINFO_TOKEN ? "SET" : "NOT SET"
+    }
+  }));
 });
 
 // Admin page (HTML)
