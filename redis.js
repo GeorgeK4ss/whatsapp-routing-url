@@ -29,12 +29,23 @@ export function getRedis() {
   }
   if (!client) {
     console.log(`[redis] Connecting to: ${url}`);
-    client = new Redis(url, {
-      tls: url.startsWith("rediss://") ? {} : undefined,
-      maxRetriesPerRequest: 2
-    });
-    client.on("error", (e) => console.error("[redis] error", e.message));
-    client.on("connect", () => console.log("[redis] Connected successfully"));
+    try {
+      client = new Redis(url, {
+        tls: url.startsWith("rediss://") ? {} : undefined,
+        maxRetriesPerRequest: 2,
+        connectTimeout: 5000,
+        lazyConnect: true
+      });
+      client.on("error", (e) => console.error("[redis] error", e.message));
+      client.on("connect", () => console.log("[redis] Connected successfully"));
+      client.on("ready", () => console.log("[redis] Ready to accept commands"));
+      client.on("close", () => console.log("[redis] Connection closed"));
+      
+      // Test connection
+      client.connect().catch(e => console.error("[redis] Connection failed:", e.message));
+    } catch (e) {
+      console.error("[redis] Failed to create client:", e.message);
+    }
   }
   return client;
 }
