@@ -69,8 +69,8 @@ After deployment, configure your WhatsApp numbers via the admin interface:
 
 **API Configuration**:
 ```bash
-# Set WhatsApp numbers
-/admin/api?token=YOUR_SECRET&default=447723342065&tr=905513797933
+# Set WhatsApp numbers (replace with your actual numbers)
+/admin/api?token=YOUR_SECRET&default=YOUR_DEFAULT_NUMBER&tr=YOUR_TURKEY_NUMBER
 
 # Add prefill texts
 /admin/api?token=YOUR_SECRET&text_default=Hello!%20How%20can%20I%20help%20you?&text_tr=Merhaba!%20Size%20nasıl%20yardımcı%20olabilirim?
