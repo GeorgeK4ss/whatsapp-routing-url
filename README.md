@@ -38,11 +38,11 @@ Visit `/admin?token=YOUR_SECRET` for a user-friendly web interface to:
 GET /admin/api?token=YOUR_SECRET&show=1
 
 - Set default (non-TR) number:
-GET /admin/api?token=YOUR_SECRET&default=447723342065
+GET /admin/api?token=YOUR_SECRET&default=YOUR_DEFAULT_NUMBER
 - Set TR number:
-GET /admin/api?token=YOUR_SECRET&tr=905513797933
+GET /admin/api?token=YOUR_SECRET&tr=YOUR_TURKEY_NUMBER
 - Optional prefill texts:
-GET /admin/api?token=YOUR_SECRET&text_default=Hello%2029Bet&text_tr=Merhaba%2029Bet
+GET /admin/api?token=YOUR_SECRET&text_default=Hello!%20How%20can%20I%20help%20you?&text_tr=Merhaba!%20Size%20nasıl%20yardımcı%20olabilirim?
 
 ## Usage
 

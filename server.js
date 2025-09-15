@@ -11,9 +11,9 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "";
 const IPINFO_TOKEN = process.env.IPINFO_TOKEN || "";
 
-// Defaults if KV empty
-const DEFAULT_NUMBER_NON_TR = "447723342065";
-const DEFAULT_NUMBER_TR = "905513797933";
+// Defaults if KV empty (replace with your actual numbers)
+const DEFAULT_NUMBER_NON_TR = "1234567890";
+const DEFAULT_NUMBER_TR = "1234567890";
 const DEFAULT_TEXT_NON_TR = "Hello! How can I help you?";
 const DEFAULT_TEXT_TR = "Merhaba! Size nasıl yardımcı olabilirim?";
 
