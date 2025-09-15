@@ -25,8 +25,8 @@ class ConfigManager {
       redisUrl: process.env.REDIS_URL,
       
       // Rate limiting
-      rateLimitWindow: parseInt(process.env.RATE_LIMIT_WINDOW) || 900000, // 15 minutes
-      rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX) || 100,
+      rateLimitWindow: parseInt(process.env.RATE_LIMIT_WINDOW) || (process.env.NODE_ENV === 'development' ? 300000 : 900000), // 5 min dev, 15 min prod
+      rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX) || (process.env.NODE_ENV === 'development' ? 1000 : 100),
       
       // Geo-location
       geoCacheTTL: parseInt(process.env.GEO_CACHE_TTL) || 86400, // 24 hours
