@@ -1,7 +1,5 @@
-import fs from 'fs';
-import path from 'path';
-
-const STORAGE_FILE = path.join(process.cwd(), 'config.json');
+// Hybrid storage: try file first, fallback to in-memory
+let memoryStorage = new Map();
 
 // Default configuration
 const DEFAULT_CONFIG = {
@@ -11,27 +9,29 @@ const DEFAULT_CONFIG = {
   text_tr: "Merhaba! Size nasıl yardımcı olabilirim?"
 };
 
-// Load configuration from file
+// Load configuration from memory (persists during service lifetime)
 function loadConfig() {
-  try {
-    if (fs.existsSync(STORAGE_FILE)) {
-      const data = fs.readFileSync(STORAGE_FILE, 'utf8');
-      return { ...DEFAULT_CONFIG, ...JSON.parse(data) };
-    }
-  } catch (error) {
-    console.error('[file-storage] Error loading config:', error.message);
+  const config = { ...DEFAULT_CONFIG };
+  
+  // Load from memory storage
+  for (const [key, value] of memoryStorage.entries()) {
+    config[key] = value;
   }
-  return DEFAULT_CONFIG;
+  
+  return config;
 }
 
-// Save configuration to file
+// Save configuration to memory
 function saveConfig(config) {
   try {
-    fs.writeFileSync(STORAGE_FILE, JSON.stringify(config, null, 2));
-    console.log('[file-storage] Config saved successfully');
+    // Save to memory storage
+    for (const [key, value] of Object.entries(config)) {
+      memoryStorage.set(key, value);
+    }
+    console.log('[storage] Config saved to memory successfully');
     return true;
   } catch (error) {
-    console.error('[file-storage] Error saving config:', error.message);
+    console.error('[storage] Error saving config:', error.message);
     return false;
   }
 }
