@@ -1,11 +1,11 @@
 import express from "express";
 import morgan from "morgan";
-import { getRedis } from "./redis.js";
+import { getFileStorage } from "./file-storage.js";
 import { fetch } from "undici";
 import { countryCodes } from "./country-codes.js";
 
 const app = express();
-const redis = getRedis();
+const storage = getFileStorage();
 
 const PORT = process.env.PORT || 3000;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "";
@@ -56,24 +56,19 @@ function getClientIP(req) {
 }
 
 async function getConfig() {
-  const [nd, ntr, td, ttr] = await Promise.all([
-    redis.get("number_default"),
-    redis.get("number_tr"),
-    redis.get("text_default"),
-    redis.get("text_tr")
-  ]);
+  const config = await storage.getAll();
   return {
-    number_default: nd || DEFAULT_NUMBER_NON_TR,
-    number_tr: ntr || DEFAULT_NUMBER_TR,
-    text_default: td || DEFAULT_TEXT_NON_TR,
-    text_tr: ttr || DEFAULT_TEXT_TR
+    number_default: config.number_default || DEFAULT_NUMBER_NON_TR,
+    number_tr: config.number_tr || DEFAULT_NUMBER_TR,
+    text_default: config.text_default || DEFAULT_TEXT_NON_TR,
+    text_tr: config.text_tr || DEFAULT_TEXT_TR
   };
 }
 
 async function setIfPresent(key, value, validator = () => true) {
   if (value !== undefined && value !== null) {
     if (!validator(value)) throw new Error(`Invalid ${key}`);
-    await redis.set(key, value);
+    await storage.set(key, value);
   }
 }
 
@@ -87,8 +82,8 @@ async function ipToCountry(ip) {
     }).catch(() => "");
   }
 
-  const cacheKey = `geo:${ip}`;
-  const cached = await redis.get(cacheKey);
+  const cacheKey = `geo_${ip}`;
+  const cached = await storage.get(cacheKey);
   if (cached) return cached;
 
   try {
@@ -96,7 +91,7 @@ async function ipToCountry(ip) {
     if (!res.ok) throw new Error("ipinfo bad response");
     const j = await res.json();
     const c = (j && j.country) ? String(j.country).toUpperCase() : "";
-    if (c) await redis.set(cacheKey, c, "EX", 24 * 3600);
+    if (c) await storage.set(cacheKey, c);
     return c;
   } catch (e) {
     return "";
