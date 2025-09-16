@@ -7,6 +7,7 @@ A production-ready Node.js service that provides intelligent country-based Whats
 - **🌍 Smart Geo-Routing**: Automatically detects user location and routes to appropriate contact channel
 - **📱 WhatsApp Support**: Turkish users → Turkish WhatsApp number, others → Default WhatsApp number
 - **✈️ Telegram Support**: Turkish users → Turkish Telegram channel, others → Default Telegram channel
+- **🌐 Website Support**: Simple website redirects with configurable redirect behavior
 - **🎛️ Admin Dashboard**: Beautiful web-based configuration management for both platforms
 - **🤖 Bot Protection**: Returns preview page for crawlers instead of redirecting
 - **⚡ Redis Caching**: Fast geo-location caching with configurable TTL
@@ -52,6 +53,15 @@ TURKEY_WHATSAPP_NUMBER=1234567890
 DEFAULT_TELEGRAM_CHANNEL=your_default_channel
 TURKEY_TELEGRAM_CHANNEL=your_turkey_channel
 
+# Website URLs
+DEFAULT_WEBSITE_URL=https://example.com
+TURKEY_WEBSITE_URL=https://turkey.example.com
+
+# Redirect Configuration
+DEFAULT_REDIRECT_TYPE=immediate
+REDIRECT_DELAY=3000
+REDIRECT_MESSAGE=Redirecting to our website...
+
 # Optional
 REDIS_URL=redis://localhost:6379
 PORT=3000
@@ -72,7 +82,7 @@ npm start
 
 Visit the admin dashboard: `http://localhost:3000/admin?token=YOUR_ADMIN_TOKEN`
 
-Configure both WhatsApp numbers and Telegram channels through the unified admin interface.
+Configure WhatsApp numbers, Telegram channels, and website URLs through the unified admin interface.
 
 ## 🌐 Usage
 
@@ -91,6 +101,16 @@ Configure both WhatsApp numbers and Telegram channels through the unified admin 
 - **Force Testing**: 
   - `/tg?force=TR` - Force Turkey routing
   - `/tg?force=REST` - Force default routing
+
+#### Website
+- **Main Redirect**: `/website` - Redirects to default website URL
+- **Target Specific**: 
+  - `/website?target=turkey` - Redirect to Turkish website
+  - `/website?target=tr` - Redirect to Turkish website (short form)
+- **Redirect Types**:
+  - `immediate` - Direct redirect (default)
+  - `delayed` - Show countdown page before redirect
+  - `custom` - Show custom landing page with button
 
 ### Admin Endpoints
 
@@ -161,6 +181,8 @@ Access the admin dashboard at `/admin?token=YOUR_TOKEN` to:
 - ✅ View current configuration
 - ✅ Update WhatsApp numbers and Telegram channels
 - ✅ Set prefill texts for both platforms
+- ✅ Configure website URLs for different targets
+- ✅ Configure redirect behavior (immediate, delayed, custom)
 - ✅ Monitor service health
 - ✅ Reset to defaults
 
@@ -187,7 +209,12 @@ Content-Type: application/json
   "tr_telegram_channel": "your_turkey_channel",
   "default_telegram_channel": "your_default_channel",
   "tr_telegram_text": "Merhaba! Size nasıl yardımcı olabilirim?",
-  "default_telegram_text": "Hello! How can I help you?"
+  "default_telegram_text": "Hello! How can I help you?",
+  "tr_website_url": "https://turkey.example.com",
+  "default_website_url": "https://example.com",
+  "redirect_type": "immediate",
+  "redirect_delay": 3000,
+  "redirect_message": "Redirecting to our website..."
 }
 ```
 
@@ -214,7 +241,9 @@ Response:
         "hasDefaultNumber": true, 
         "hasTurkeyNumber": true,
         "hasDefaultTelegramChannel": true,
-        "hasTurkeyTelegramChannel": true
+        "hasTurkeyTelegramChannel": true,
+        "hasDefaultWebsiteUrl": true,
+        "hasTurkeyWebsiteUrl": true
       }
     },
     "environment": {
@@ -238,7 +267,8 @@ src/
 ├── routes/          # Express routes
 │   ├── admin.js     # Admin dashboard & API
 │   ├── whatsapp.js  # WhatsApp redirect logic
-│   └── telegram.js  # Telegram redirect logic
+│   ├── telegram.js  # Telegram redirect logic
+│   └── website.js   # Website redirect logic
 ├── services/        # Business logic
 │   └── geo.js       # Geo-location service
 ├── storage/         # Data persistence
@@ -305,9 +335,16 @@ curl "http://localhost:3000/tg?force=REST"
 # Test Telegram with custom text
 curl "http://localhost:3000/tg?text=Test%20Message"
 
+# Test Website Turkey redirect
+curl "http://localhost:3000/website?target=turkey"
+
+# Test Website default redirect
+curl "http://localhost:3000/website"
+
 # Test bot detection
 curl -H "User-Agent: Googlebot/2.1" "http://localhost:3000/wa"
 curl -H "User-Agent: Googlebot/2.1" "http://localhost:3000/tg"
+curl -H "User-Agent: Googlebot/2.1" "http://localhost:3000/website"
 ```
 
 ### Health Checks
@@ -349,6 +386,11 @@ curl "http://localhost:3000/admin/api/health?token=YOUR_TOKEN"
    - Check channels exist and are accessible
    - Test with force parameters
 
+6. **Website redirects not working**
+   - Verify website URLs are valid HTTP/HTTPS URLs
+   - Check websites are accessible
+   - Test with target parameters
+
 ### Debug Mode
 
 Set `LOG_LEVEL=debug` for detailed logging:
@@ -384,4 +426,4 @@ MIT License - see LICENSE file for details.
 
 ---
 
-**Made with ❤️ for global WhatsApp and Telegram connectivity**
+**Made with ❤️ for global WhatsApp, Telegram, and website connectivity**

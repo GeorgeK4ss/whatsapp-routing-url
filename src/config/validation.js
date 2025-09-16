@@ -3,6 +3,7 @@ import { ValidationError } from '../utils/errors.js';
 export const phoneNumberRegex = /^[1-9]\d{6,14}$/;
 export const countryCodeRegex = /^\d{1,4}$/;
 export const telegramChannelRegex = /^[a-zA-Z0-9_]{5,32}$/;
+export const websiteUrlRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 
 export function validatePhoneNumber(number, field = 'phone') {
   if (!number) {
@@ -50,6 +51,44 @@ export function validateTelegramChannel(channel, field = 'Telegram channel') {
   }
   
   return cleanChannel;
+}
+
+export function validateWebsiteUrl(url, field = 'website URL') {
+  if (!url) {
+    throw new ValidationError(`${field} is required`, field);
+  }
+  
+  if (!websiteUrlRegex.test(url)) {
+    throw new ValidationError(`${field} must be a valid HTTP or HTTPS URL`, field);
+  }
+  
+  return url;
+}
+
+export function validateRedirectType(type, field = 'redirect type') {
+  if (!type) {
+    throw new ValidationError(`${field} is required`, field);
+  }
+  
+  const validTypes = ['immediate', 'delayed', 'custom'];
+  if (!validTypes.includes(type.toLowerCase())) {
+    throw new ValidationError(`${field} must be one of: ${validTypes.join(', ')}`, field);
+  }
+  
+  return type.toLowerCase();
+}
+
+export function validateRedirectDelay(delay, field = 'redirect delay') {
+  if (delay === undefined || delay === null) {
+    return 3000; // default value
+  }
+  
+  const numDelay = parseInt(delay);
+  if (isNaN(numDelay) || numDelay < 0 || numDelay > 30000) {
+    throw new ValidationError(`${field} must be a number between 0 and 30000 milliseconds`, field);
+  }
+  
+  return numDelay;
 }
 
 export function validateAdminToken(token) {
@@ -136,6 +175,40 @@ export function validateConfiguration(config) {
   if (config.telegram_text_tr !== undefined) {
     try {
       validateText(config.telegram_text_tr, 'Turkey Telegram text');
+    } catch (error) {
+      errors.push(error.message);
+    }
+  }
+  
+  // Validate website URLs if present
+  if (config.website_url_default) {
+    try {
+      validateWebsiteUrl(config.website_url_default, 'default website URL');
+    } catch (error) {
+      errors.push(error.message);
+    }
+  }
+  
+  if (config.website_url_tr) {
+    try {
+      validateWebsiteUrl(config.website_url_tr, 'Turkey website URL');
+    } catch (error) {
+      errors.push(error.message);
+    }
+  }
+  
+  // Validate redirect configuration if present
+  if (config.redirect_type) {
+    try {
+      validateRedirectType(config.redirect_type, 'redirect type');
+    } catch (error) {
+      errors.push(error.message);
+    }
+  }
+  
+  if (config.redirect_delay !== undefined) {
+    try {
+      validateRedirectDelay(config.redirect_delay, 'redirect delay');
     } catch (error) {
       errors.push(error.message);
     }

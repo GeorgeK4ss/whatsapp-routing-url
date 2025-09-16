@@ -8,6 +8,7 @@ import { rateLimitMiddleware, adminRateLimitMiddleware } from './middleware/rate
 import adminRouter from './routes/admin.js';
 import whatsappRouter from './routes/whatsapp.js';
 import telegramRouter from './routes/telegram.js';
+import websiteRouter from './routes/website.js';
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use(rateLimitMiddleware);
 app.use('/admin', adminRateLimitMiddleware, adminRouter);
 app.use('/', whatsappRouter);
 app.use('/', telegramRouter);
+app.use('/', websiteRouter);
 
 // Root endpoint - health check and status
 app.get('/', async (req, res) => {
@@ -68,6 +70,7 @@ app.get('/', async (req, res) => {
       endpoints: {
         whatsapp: '/wa',
         telegram: '/tg',
+        website: '/website',
         admin: '/admin',
         health: '/health',
         metrics: '/metrics'

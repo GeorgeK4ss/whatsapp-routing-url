@@ -3,7 +3,7 @@ import { configStorage } from '../storage/config.js';
 import { config } from '../config/settings.js';
 import { logger } from '../utils/logger.js';
 import { asyncHandler, AppError } from '../utils/errors.js';
-import { validateAdminToken, validatePhoneNumber, validateText, validateTelegramChannel } from '../config/validation.js';
+import { validateAdminToken, validatePhoneNumber, validateText, validateTelegramChannel, validateWebsiteUrl, validateRedirectType, validateRedirectDelay } from '../config/validation.js';
 import { countryCodes } from '../data/country-codes.js';
 
 const router = express.Router();
@@ -47,7 +47,8 @@ router.get('/api/config', validateAdmin, asyncHandler(async (req, res) => {
 router.post('/api/config', validateAdmin, asyncHandler(async (req, res) => {
   const { 
     tr_number, default_number, default_country_code, tr_text, default_text,
-    tr_telegram_channel, default_telegram_channel, tr_telegram_text, default_telegram_text
+    tr_telegram_channel, default_telegram_channel, tr_telegram_text, default_telegram_text,
+    tr_website_url, default_website_url, redirect_type, redirect_delay, redirect_message
   } = req.body;
   
   const updates = {};
@@ -89,6 +90,28 @@ router.post('/api/config', validateAdmin, asyncHandler(async (req, res) => {
   
   if (default_telegram_text !== undefined) {
     updates.telegram_text_default = validateText(default_telegram_text, 'default Telegram text');
+  }
+  
+  // Process website URLs
+  if (tr_website_url) {
+    updates.website_url_tr = validateWebsiteUrl(tr_website_url, 'Turkey website URL');
+  }
+  
+  if (default_website_url) {
+    updates.website_url_default = validateWebsiteUrl(default_website_url, 'default website URL');
+  }
+  
+  // Process redirect configuration
+  if (redirect_type) {
+    updates.redirect_type = validateRedirectType(redirect_type, 'redirect type');
+  }
+  
+  if (redirect_delay !== undefined && redirect_delay !== '') {
+    updates.redirect_delay = validateRedirectDelay(redirect_delay, 'redirect delay');
+  }
+  
+  if (redirect_message !== undefined) {
+    updates.redirect_message = validateText(redirect_message, 'redirect message', 200);
   }
   
   const updatedConfig = await configStorage.updateConfig(updates);
@@ -374,6 +397,26 @@ function generateAdminHTML(currentConfig, envStatus) {
           <span class="current-label">Default Telegram Text:</span>
           <span class="current-value">${currentConfig.telegram_text_default || '(none)'}</span>
         </div>
+        <div class="current-item">
+          <span class="current-label">Turkey Website URL:</span>
+          <span class="current-value">${currentConfig.website_url_tr || '(none)'}</span>
+        </div>
+        <div class="current-item">
+          <span class="current-label">Default Website URL:</span>
+          <span class="current-value">${currentConfig.website_url_default || '(none)'}</span>
+        </div>
+        <div class="current-item">
+          <span class="current-label">Redirect Type:</span>
+          <span class="current-value">${currentConfig.redirect_type || 'immediate'}</span>
+        </div>
+        <div class="current-item">
+          <span class="current-label">Redirect Delay:</span>
+          <span class="current-value">${currentConfig.redirect_delay || 3000}ms</span>
+        </div>
+        <div class="current-item">
+          <span class="current-label">Redirect Message:</span>
+          <span class="current-value">${currentConfig.redirect_message || 'Redirecting to our website...'}</span>
+        </div>
       </div>
 
       <form id="configForm">
@@ -450,6 +493,54 @@ function generateAdminHTML(currentConfig, envStatus) {
           <div class="help">Optional text to prefill for non-Turkish users on Telegram</div>
         </div>
 
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #e9ecef;">
+        <h3 style="margin: 0 0 20px; color: #2c3e50; text-align: center;">🌐 Website Configuration</h3>
+
+        <div class="form-group">
+          <label for="tr_website_url">🇹🇷 Turkey Website URL</label>
+          <input type="url" id="tr_website_url" name="tr_website_url" 
+                 value="${currentConfig.website_url_tr || ''}" 
+                 placeholder="https://turkey.example.com">
+          <div class="help">Website URL for Turkish users (can be different each time)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="default_website_url">🌍 Default Website URL</label>
+          <input type="url" id="default_website_url" name="default_website_url" 
+                 value="${currentConfig.website_url_default || ''}" 
+                 placeholder="https://example.com">
+          <div class="help">Website URL for non-Turkish users</div>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #e9ecef;">
+        <h3 style="margin: 0 0 20px; color: #2c3e50; text-align: center;">🔄 Redirect Configuration</h3>
+
+        <div class="form-group">
+          <label for="redirect_type">🔄 Redirect Type</label>
+          <select id="redirect_type" name="redirect_type">
+            <option value="immediate" ${currentConfig.redirect_type === 'immediate' ? 'selected' : ''}>Immediate Redirect</option>
+            <option value="delayed" ${currentConfig.redirect_type === 'delayed' ? 'selected' : ''}>Delayed Redirect</option>
+            <option value="custom" ${currentConfig.redirect_type === 'custom' ? 'selected' : ''}>Custom Redirect Page</option>
+          </select>
+          <div class="help">Choose how redirects should behave</div>
+        </div>
+
+        <div class="form-group">
+          <label for="redirect_delay">⏱️ Redirect Delay (milliseconds)</label>
+          <input type="number" id="redirect_delay" name="redirect_delay" 
+                 value="${currentConfig.redirect_delay || 3000}" 
+                 min="0" max="30000" step="100">
+          <div class="help">Delay before redirect (0-30000ms, only used for delayed redirects)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="redirect_message">💬 Redirect Message</label>
+          <textarea id="redirect_message" name="redirect_message" 
+                    placeholder="Redirecting to our website..." 
+                    maxlength="200">${currentConfig.redirect_message || ''}</textarea>
+          <div class="help">Message to display during redirect (max 200 characters)</div>
+        </div>
+
         <div class="btn-group">
           <button type="submit" class="btn">💾 Save Configuration</button>
           <button type="button" id="resetBtn" class="btn btn-danger">🔄 Reset to Defaults</button>
@@ -498,7 +589,12 @@ function generateAdminHTML(currentConfig, envStatus) {
         tr_telegram_channel: formData.get('tr_telegram_channel'),
         default_telegram_channel: formData.get('default_telegram_channel'),
         tr_telegram_text: formData.get('tr_telegram_text'),
-        default_telegram_text: formData.get('default_telegram_text')
+        default_telegram_text: formData.get('default_telegram_text'),
+        tr_website_url: formData.get('tr_website_url'),
+        default_website_url: formData.get('default_website_url'),
+        redirect_type: formData.get('redirect_type'),
+        redirect_delay: formData.get('redirect_delay'),
+        redirect_message: formData.get('redirect_message')
       };
       
       try {

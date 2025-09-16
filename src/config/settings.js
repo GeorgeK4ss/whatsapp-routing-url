@@ -20,6 +20,15 @@ class ConfigManager {
       telegram_text_default: process.env.DEFAULT_TELEGRAM_TEXT || "Hello! How can I help you?",
       telegram_text_tr: process.env.TURKEY_TELEGRAM_TEXT || "Merhaba! Size nasıl yardımcı olabilirim?",
       
+      // Website URLs
+      website_url_default: process.env.DEFAULT_WEBSITE_URL || "https://example.com",
+      website_url_tr: process.env.TURKEY_WEBSITE_URL || "https://turkey.example.com",
+      
+      // Redirect configuration
+      redirect_type: process.env.DEFAULT_REDIRECT_TYPE || "immediate",
+      redirect_delay: parseInt(process.env.REDIRECT_DELAY) || 3000,
+      redirect_message: process.env.REDIRECT_MESSAGE || "Redirecting to our website...",
+      
       // Service configuration
       port: parseInt(process.env.PORT) || 3000,
       nodeEnv: process.env.NODE_ENV || 'development',
@@ -131,7 +140,12 @@ class ConfigManager {
       telegram_channel_default: this.config.telegram_channel_default,
       telegram_channel_tr: this.config.telegram_channel_tr,
       telegram_text_default: this.config.telegram_text_default,
-      telegram_text_tr: this.config.telegram_text_tr
+      telegram_text_tr: this.config.telegram_text_tr,
+      website_url_default: this.config.website_url_default,
+      website_url_tr: this.config.website_url_tr,
+      redirect_type: this.config.redirect_type,
+      redirect_delay: this.config.redirect_delay,
+      redirect_message: this.config.redirect_message
     };
   }
 

@@ -40,6 +40,21 @@ services:
       - key: TURKEY_TELEGRAM_TEXT
         value: "Merhaba! Size nasıl yardımcı olabilirim?"
         description: "Turkey Telegram prefill text for Turkish users"
+      - key: DEFAULT_WEBSITE_URL
+        value: "https://example.com"
+        description: "Default website URL (used when no target is specified)"
+      - key: TURKEY_WEBSITE_URL
+        value: "https://turkey.example.com"
+        description: "Turkey website URL (can be different each time)"
+      - key: DEFAULT_REDIRECT_TYPE
+        value: "immediate"
+        description: "Default redirect behavior (immediate, delayed, or custom)"
+      - key: REDIRECT_DELAY
+        value: 3000
+        description: "Redirect delay in milliseconds (for delayed redirects)"
+      - key: REDIRECT_MESSAGE
+        value: "Redirecting to our website..."
+        description: "Custom redirect message (optional)"
       - key: LOG_LEVEL
         value: info
         description: "Logging level (error, warn, info, debug)"

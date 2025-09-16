@@ -45,7 +45,12 @@ class ConfigStorage {
         telegram_channel_default: config.get('telegram_channel_default'),
         telegram_channel_tr: config.get('telegram_channel_tr'),
         telegram_text_default: config.get('telegram_text_default'),
-        telegram_text_tr: config.get('telegram_text_tr')
+        telegram_text_tr: config.get('telegram_text_tr'),
+        website_url_default: config.get('website_url_default'),
+        website_url_tr: config.get('website_url_tr'),
+        redirect_type: config.get('redirect_type'),
+        redirect_delay: config.get('redirect_delay'),
+        redirect_message: config.get('redirect_message')
       };
 
       logger.info('Using default configuration');
@@ -109,7 +114,12 @@ class ConfigStorage {
         telegram_channel_default: config.get('telegram_channel_default'),
         telegram_channel_tr: config.get('telegram_channel_tr'),
         telegram_text_default: config.get('telegram_text_default'),
-        telegram_text_tr: config.get('telegram_text_tr')
+        telegram_text_tr: config.get('telegram_text_tr'),
+        website_url_default: config.get('website_url_default'),
+        website_url_tr: config.get('website_url_tr'),
+        redirect_type: config.get('redirect_type'),
+        redirect_delay: config.get('redirect_delay'),
+        redirect_message: config.get('redirect_message')
       };
       
       await this.setConfig(defaultConfig);
@@ -154,6 +164,11 @@ class ConfigStorage {
           hasTurkeyNumber: !!configTest.number_tr,
           hasDefaultTelegramChannel: !!configTest.telegram_channel_default,
           hasTurkeyTelegramChannel: !!configTest.telegram_channel_tr,
+          hasDefaultWebsiteUrl: !!configTest.website_url_default,
+          hasTurkeyWebsiteUrl: !!configTest.website_url_tr,
+          hasRedirectType: !!configTest.redirect_type,
+          hasRedirectDelay: !!configTest.redirect_delay,
+          hasRedirectMessage: !!configTest.redirect_message,
           keys: Object.keys(configTest)
         }
       };
